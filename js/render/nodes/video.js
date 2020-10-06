@@ -32,7 +32,7 @@ const GL = WebGLRenderingContext; // For enums
 class VideoMaterial extends Material {
   constructor() {
     super();
-
+    
     this.image = this.defineSampler('diffuse');
 
     this.texCoordScaleOffset = this.defineUniform('texCoordScaleOffset',
@@ -50,7 +50,7 @@ class VideoMaterial extends Material {
     uniform vec4 texCoordScaleOffset[2];
     attribute vec3 POSITION;
     attribute vec2 TEXCOORD_0;
-    varying vec2 vTexCoord;
+    varying vec2 vUv;
 
     vec4 vertex_main(mat4 proj, mat4 view, mat4 model) {
       vec4 scaleOffset = texCoordScaleOffset[EYE_INDEX];
@@ -62,11 +62,13 @@ class VideoMaterial extends Material {
 
   get fragmentSource() {
     return `
-    uniform sampler2D diffuse;
-    varying vec2 vTexCoord;
+    uniform sampler2D texture;
+    varying vec2 vUv;
 
     vec4 fragment_main() {
-      return texture2D(diffuse, vTexCoord);
+      return gl_FragColor = vec4(
+        texture2D(texture, vec2(vUv.x, 0.5 + vUv.y/2.)).rgb,
+        texture2D(texture, vec2(vUv.x, vUv.y/2.)).r;
     }`;
   }
 }
